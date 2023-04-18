@@ -30,7 +30,9 @@ sub buildToHash {
         system => $build->system,
         nixname => $build->nixname,
         finished => $build->finished,
-        timestamp => $build->timestamp
+        timestamp => $build->timestamp,
+        buildstatus => undef,
+        priority => undef
     };
 
     if($build->finished) {
@@ -216,8 +218,8 @@ sub scmdiff : Path('/api/scmdiff') Args(0) {
     } elsif ($type eq "git") {
         my $clonePath = getSCMCacheDir . "/git/" . sha256_hex($uri);
         die if ! -d $clonePath;
-        $diff .= `(cd $clonePath; git log $rev1..$rev2)`;
-        $diff .= `(cd $clonePath; git diff $rev1..$rev2)`;
+        $diff .= `(cd $clonePath; git --git-dir .git log $rev1..$rev2)`;
+        $diff .= `(cd $clonePath; git --git-dir .git diff $rev1..$rev2)`;
     }
 
     $c->stash->{'plain'} = { data => (scalar $diff) || " " };
